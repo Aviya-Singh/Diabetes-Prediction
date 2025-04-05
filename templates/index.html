@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetes Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
+    <style>
+        /* Custom styles for the message box */
+        #message-box {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f0fdf4;
+            color: #15803d;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #16a34a;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        #message-box.show {
+            display: block;
+        }
+
+        /* Custom CSS for enhanced UI - Refined Glassmorphism */
+        .glassmorphism {
+            background-color: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            border-radius: 16px;
+        }
+
+        .form-group label {
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            padding: 10px;
+            width: 100%;
+            transition: all 0.2s ease-in-out;
+            font-size: 16px;
+            color: #2d3748;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: rgba(56, 189, 248, 0.5);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        button[type="submit"] {
+            background-image: linear-gradient(to right, #6ee7b7, #3b82f6);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            border: none;
+            font-size: 18px;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        button[type="submit"]:hover {
+            background-image: linear-gradient(to right, #14b8a6, #2563eb);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #result {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #4f46e5;
+            padding: 16px;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        #message-box {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f0fdf4;
+            color: #15803d;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #16a34a;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            text-align: center;
+            font-size: 16px;
+        }
+        #message-box.show {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out, fadeOut 2.5s ease-in-out 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -30px); }
+            to { opacity: 1; transform: translateX(-50%); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateX(-50%); }
+            to { opacity: 0; transform: translate(-50%, -30px); }
+        }
+
+    </style>
+</head>
+<body class="bg-gradient-to-r from-teal-100 to-lime-100 font-inter flex justify-center items-center min-h-screen p-4">
+    <div class="container glassmorphism p-8 w-full max-w-2xl">
+        <h1 class="text-3xl font-semibold text-center text-black-700 mb-8">Diabetes Prediction</h1>
+        <form method="POST" action="/" id="prediction-form" class="space-y-6">
+            <div class="form-group">
+                <label for="age">Age:</label>
+                <input type="number" name="age" id="age" required>
+                <p id="age-error" class="error-message"></p>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select name="gender" id="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="0">Female</option>
+                    <option value="1">Male</option>
+                </select>
+                <p id="gender-error" class="error-message"></p>
+            </div>
+            
+            <!-- Replace all Yes/No text inputs with select dropdowns -->
+            <div class="form-group">
+                <label for="Polyuria">Polyuria:</label>
+                <select name="Polyuria" id="Polyuria" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Polyuria-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Polydipsia">Polydipsia:</label>
+                <select name="Polydipsia" id="Polydipsia" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Polydipsia-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Weight">Weight Loss:</label>
+                <select name="Weight" id="Weight" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Weight-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Weakness">Weakness:</label>
+                <select name="Weakness" id="Weakness" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Weakness-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Polyphagia">Polyphagia:</label>
+                <select name="Polyphagia" id="Polyphagia" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Polyphagia-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Thrush">Thrush:</label>
+                <select name="Thrush" id="Thrush" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Thrush-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Blurring">Visual Blurring:</label>
+                <select name="Blurring" id="Blurring" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Blurring-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Itching">Itching:</label>
+                <select name="Itching" id="Itching" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Itching-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Irritability">Irritability:</label>
+                <select name="Irritability" id="Irritability" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Irritability-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Healing">Delayed Healing:</label>
+                <select name="Healing" id="Healing" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Healing-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Paresis">Muscle Weakness:</label>
+                <select name="Paresis" id="Paresis" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Paresis-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Stiffness">Muscle Stiffness:</label>
+                <select name="Stiffness" id="Stiffness" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Stiffness-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Alopecia">Hair Loss:</label>
+                <select name="Alopecia" id="Alopecia" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Alopecia-error" class="error-message"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="Obesity">Obesity:</label>
+                <select name="Obesity" id="Obesity" required>
+                    <option value="">Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <p id="Obesity-error" class="error-message"></p>
+            </div>
+            
+            <button type="submit">Predict</button>
+        </form>
+        <div id="result" class="">
+            {% if value %}
+                Result: <span class="{% if value == 'Diabetes' %}text-red-600{% else %}text-green-600{% endif %}">{{ value }}</span>
+            {% endif %}
+        </div>
+        <div id="message-box" class="hidden"></div>
+    </div>
+
+    <script>
+        // Get the message box element
+        const messageBox = document.getElementById('message-box');
+
+        // Function to show the message
+        function showMessage(message, type = 'success') {
+            messageBox.textContent = message;
+            messageBox.className = `fixed top-4 left-1/2 transform -translate-x-1/2 bg-${type === 'success' ? 'green' : 'red'}-100 text-${type === 'success' ? 'green' : 'red'}-700 border border-${type === 'success' ? 'green' : 'red'}-400 px-4 py-2 rounded-xl shadow-lg text-center`;
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+
+        document.getElementById('prediction-form').addEventListener('submit', function(event) {
+            let hasErrors = false;
+            
+            // Validate age
+            const ageInput = document.getElementById('age');
+            const ageValue = parseInt(ageInput.value);
+            const ageError = document.getElementById('age-error');
+            if (isNaN(ageValue) || ageValue <= 0) {
+                ageError.textContent = "Age must be a positive number.";
+                ageError.classList.add('show');
+                hasErrors = true;
+            } else {
+                ageError.classList.remove('show');
+            }
+
+            // Validate gender
+            const genderInput = document.getElementById('gender');
+            const genderError = document.getElementById('gender-error');
+            if (genderInput.value === "") {
+                genderError.textContent = "Please select a gender.";
+                genderError.classList.add('show');
+                hasErrors = true;
+            } else {
+                genderError.classList.remove('show');
+            }
+
+            // Check all select fields have values
+            const selects = document.querySelectorAll('select');
+            selects.forEach(select => {
+                const error = document.getElementById(`${select.id}-error`);
+                if (select.value === "") {
+                    error.textContent = `Please select an option for ${select.previousElementSibling.textContent.replace(':', '')}.`;
+                    error.classList.add('show');
+                    hasErrors = true;
+                } else {
+                    if (error) error.classList.remove('show');
+                }
+            });
+
+            if (hasErrors) {
+                event.preventDefault();
+                showMessage('Please fix the errors in the form.', 'error');
+            } else {
+                showMessage('Processing your request...', 'success');
+                // Form will submit normally since we're not preventing default here
+            }
+        });
+    </script>
+</body>
+</html>
