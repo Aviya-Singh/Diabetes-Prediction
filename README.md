@@ -81,8 +81,6 @@ Our best model achieved:
 - Recall: ~82%
 - F1-score: ~81%
 
-Detailed performance metrics and visualizations can be found in the [notebooks](./notebooks) directory.
-
 ## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
 
