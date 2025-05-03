@@ -1,94 +1,146 @@
-# Diabetes Prediction
+# Diabetes Prediction Using Machine Learning and Flask
 
-## Overview
-This project focuses on predicting diabetes using machine learning algorithms. By analyzing various health metrics, the system can identify individuals at risk of developing diabetes, enabling early intervention and prevention.
+## Project Overview
 
-## Table of Contents
-- [Dataset](#dataset)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Model Architecture](#model-architecture)
-- [Results](#results)
-- [Contributing](#contributing)
-- [License](#license)
+This project aims to predict the likelihood of a person being diabetic based on a variety of medical parameters. It combines:
+
+* Data preprocessing
+* Exploratory data analysis (EDA)
+* Model training and evaluation using multiple machine learning algorithms
+* Web-based frontend built with HTML and Bootstrap
+* Flask-based backend to serve the trained model for real-time predictions
+
+## Technologies Used
+
+* Python 3
+* Pandas, NumPy
+* Scikit-learn
+* Seaborn, Matplotlib, Plotly
+* Flask
+* HTML/CSS with Bootstrap
+* Jupyter Notebook
 
 ## Dataset
-The project uses the PIMA Indians Diabetes dataset, which includes health metrics from individuals with and without diabetes. The dataset contains the following attributes:
-- Pregnancies
-- Glucose
-- Blood Pressure
-- Skin Thickness
-- Insulin
-- BMI (Body Mass Index)
-- Diabetes Pedigree Function
-- Age
-- Outcome (Target variable: 1 for diabetes, 0 for no diabetes)
 
-## Features
-- Data preprocessing and cleaning
-- Exploratory data analysis with visualizations
-- Feature selection and engineering
-- Implementation of various classification algorithms
-- Model evaluation and comparison
-- User-friendly prediction interface
+The dataset used is `diabetes_data_upload.csv`, containing 520 rows and 17 columns.
 
-## Installation
+### Features include:
+
+* Demographics: Age, Gender
+* Symptoms: Polyuria, Polydipsia, Sudden Weight Loss, Weakness, etc.
+* Target: Class (Positive/Negative for diabetes)
+
+All features are categorical except Age.
+
+
+## Data Analysis & Visualization
+
+* Histogram and pie plots were created using Plotly to explore relationships between features and the target class.
+* Crosstabs and heatmaps (Seaborn) were used to analyze the conditional probabilities and correlations between variables.
+
+Key Insights:
+
+* High correlation of diabetes with Polyuria, Polydipsia, and Sudden Weight Loss.
+* Gender and age distribution indicate higher cases in older males.
+* Weakness and Partial Paresis also show strong association.
+
+## Model Building
+
+### Preprocessing
+
+* Categorical variables were encoded using `LabelEncoder`
+* Age column was scaled using `MinMaxScaler`
+* Dataset split into independent features `X` and target `Y`
+
+### Train-Test Split
+
+* Dataset split into training and test sets (80/20 or 70/30 depending on model)
+* Stratified sampling was used to preserve class distribution
+
+### Models Implemented
+
+* Logistic Regression
+* Decision Tree Classifier
+* Support Vector Machine (SVC)
+* Random Forest Classifier
+* K-Nearest Neighbors (KNN)
+
+All models were evaluated using metrics like Accuracy, Precision, Recall, F1-score, Confusion Matrix, and ROC.
+
+## Model Evaluation
+
+| Model                  | Accuracy | Recall | Precision |
+| ---------------------- | -------- | ------ | --------- |
+| Random Forest          | 95.51%   | 0.9711 | 0.9619    |
+| Decision Tree          | 95.51%   | 0.9551 | 0.9551    |
+| Logistic Regression    | 94.87%   | 0.9487 | 0.9487    |
+| Support Vector Machine | 91.67%   | 0.9167 | 0.9167    |
+| KNN (k=2)              | 83.97%   | 0.7884 | 0.9647    |
+
+The **Random Forest Classifier** achieved the highest accuracy and was saved using Python `pickle` for use in the web application.
+
+## Web Application
+
+A web application was built using Flask.
+
+* Frontend: HTML form styled with Bootstrap for user input
+* Backend: Flask receives the input, processes it, feeds it into the model, and returns prediction
+
+### Inputs Collected:
+
+* Age, Gender, Polyuria, Polydipsia, Sudden Weight Loss, Weakness, Polyphagia, Genital Thrush, Visual Blurring, Itching, Irritability, Delayed Healing, Partial Paresis, Muscle Stiffness, Alopecia, Obesity
+
+### Output:
+
+* "Diabetes" or "No Diabetes" message with color-coded feedback
+
+## Installation & Running
+
+### 1. Clone the repository
+
 ```bash
-# Clone the repository
-git clone https://github.com/Aviya-Singh/Diabetes-Prediction.git
-cd Diabetes-Prediction
+git clone <repo-url>
+cd <repo-folder>
+```
 
-# Create a virtual environment (optional but recommended)
-python -m venv venv
-source venv/bin/activate  # On Windows, use: venv\Scripts\activate
+### 2. Install dependencies
 
-# Install dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-## Usage
-To train and evaluate the model:
+### 3. Train the model
+
 ```bash
-python train_model.py
+python model_training.py
 ```
 
-To make predictions using the trained model:
-```bash
-python predict.py --input path/to/input_data.csv
-```
+### 4. Run the web server
 
-For the web interface (if available):
 ```bash
 python app.py
 ```
-Then navigate to `http://localhost:5000` in your web browser.
 
-## Model Architecture
-This project implements several machine learning algorithms including:
-- Logistic Regression
-- Random Forest
-- Support Vector Machines (SVM)
-- K-Nearest Neighbors (KNN)
-- Neural Networks
-
-The best-performing model was selected based on metrics such as accuracy, precision, recall, and F1-score.
+Visit `http://127.0.0.1:5000/` in your browser.
 
 ## Results
-Our best model achieved:
-- Accuracy: ~85%
-- Precision: ~80%
-- Recall: ~82%
-- F1-score: ~81%
 
-## Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+The application correctly classifies diabetic and non-diabetic cases with high accuracy.
+The Random Forest classifier, integrated into the backend, showed strong sensitivity and specificity, making it reliable for early screening applications.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+This project is licensed under the Modified BSD License - see the [LICENSE](https://opensource.org/licenses/BSD-3-Clause) file for details.
+
+## Acknowledgment
+
+* Dataset from Kaggle or UCI (as applicable)
+* Developed using Python, Flask, and ML libraries
+* Frontend styling via Bootstrap 5
+
+## References
+
+[1] Y. K. Qawqzeh, , A. S. Bajahzar, M. Jemmali, M. M. Otoom, and A. Thaljaoui, "“Classification of diabetes using photoplethysmogram (PPG) waveform analysis: logistic regression modeling,”," BioMed Research International, p. 6, 2020.
+[2] D. K. Choubey, M. Kumar, V. Shukla, S. Tripathi, and V. K. Dhandhania, "“Comparative analysis of classification methods with PCA and LDA for diabetes,”," Current Diabetes Reviews,, vol. 16 no 8, pp. 833-850, 2020.
+[3] M. Maniruzzaman, M. J. Rahman, B. Ahammed, and M. M. Abedin, "“Classification and prediction of diabetes disease using machine learning paradigm,”," Health Information Science and Systems, vol. 8 no.1, pp. 7-14, 2020.
+[4] R. Ahuja, S. C. Sharma, and M. Ali, "“A diabetic disease prediction model based on classification algorithms,”," Annals of Emerging Technologies in Computing, vol. 3.no.3, pp. 44-52, 2019.
